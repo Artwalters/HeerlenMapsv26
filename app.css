@@ -1,0 +1,1559 @@
+/* 
+ * Mapbox Interactive Application CSS
+ * A comprehensive stylesheet for a map-based application
+ * with custom markers, popups, and guided tours
+ */
+
+/* ==============================
+ * CORE LAYOUT & INTERACTION 
+ * ============================== */
+
+/* Prevent scrolling on main container */
+.page-wrapper {
+  touch-action: none;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Interaction controls */
+.threebox-canvas, 
+.threebox-container {
+  pointer-events: none !important;
+  touch-action: none !important;
+}
+
+.mapboxgl-canvas {
+  pointer-events: auto !important;
+}
+
+/* Z-index Management */
+:root {
+  --z-map: 1;
+  --z-controls: 100;
+  --z-popups: 200;
+  --z-modals: 300;
+  --z-notifications: 400;
+}
+
+.mapboxgl-map {
+  z-index: var(--z-map);
+}
+
+.mapboxgl-ctrl-group {
+  z-index: var(--z-controls);
+}
+
+.mapboxgl-popup {
+  z-index: var(--z-popups);
+}
+
+.location-boundary-popup {
+  z-index: var(--z-modals);
+}
+
+.geolocation-error-notification {
+  z-index: var(--z-notifications);
+}
+/* ==============================
+ * MAPBOX CONTROLS & BRANDING 
+ * ============================== */
+
+/* Hide Mapbox branding */
+.mapboxgl-ctrl-logo,
+.mapboxgl-ctrl-attrib {
+  display: none !important;
+}
+
+/* Control positioning */
+.mapboxgl-ctrl-top-right .mapboxgl-ctrl {
+  float: right !important;
+  margin-right: 0 !important;
+}
+
+.mapboxgl-ctrl-bottom-right .mapboxgl-ctrl {
+  float: right;
+  margin: 0 !important;
+}
+
+/* Hide zoom controls */
+.mapboxgl-ctrl-top-right .mapboxgl-ctrl-zoom {
+  display: none !important;
+}
+
+/* Control group styling with enhanced frosted glass effect */
+.mapboxgl-ctrl-group {
+  background: white!important;
+  border: 1.5px solid black !important;
+  border-radius: 25px !important;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Adding texture to frosted glass */
+.mapboxgl-ctrl-group::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+  opacity: 0.3;
+  z-index: -1;
+  mix-blend-mode: overlay;
+}
+
+/* Glass effect for buttons inside control group */
+.mapboxgl-ctrl-group button {
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: none !important;
+  border: none;
+  color: #333;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.mapboxgl-ctrl-group:not(:empty) {
+  box-shadow: none !important;
+}
+
+.mapboxgl-ctrl-group button::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(125deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 40%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.mapboxgl-ctrl-group button:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.05);
+}
+
+/* Button spacing */
+.mapboxgl-ctrl-help,
+.mapboxgl-ctrl-top-right .mapboxgl-ctrl:not(.mapboxgl-ctrl-group) {
+  margin: 0 0 10px 0 !important;
+}
+
+/* Control positioning */
+.mapboxgl-ctrl-top-right {
+  margin-top: 12em;
+  margin-right: 4rem;
+}
+
+.mapboxgl-ctrl-bottom-right {
+  margin-bottom: 3rem !important;
+  margin-right: 4rem;
+}
+ 
+
+/* Responsive adjustments for controls */
+@media screen and (max-width: 991px) {
+  .mapboxgl-ctrl-top-right,
+  .mapboxgl-ctrl-bottom-right {
+    margin-right: 3rem;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .mapboxgl-ctrl-top-right {
+    margin-right: 2rem;
+    margin-top: 8rem;
+  }
+  .mapboxgl-ctrl-bottom-right{
+    margin-right: 1.5rem;
+    margin-bottom: 2rem;
+  }
+}
+
+
+@media screen and (max-width: 480px) {
+  .mapboxgl-ctrl-top-right {
+    margin-right: 1.5rem;
+    margin-top: 8rem;
+  }
+  .mapboxgl-ctrl-bottom-right{
+    margin-right: 1.5rem;
+  }
+}
+/* ==============================
+ * MARKERS & RADIUS INDICATORS
+ * ============================== */
+
+.marker-wrapper {
+  position: relative;
+}
+
+.custom-marker {
+  cursor: pointer;
+}
+
+/* Marker animation and transitions */
+.locations-map_item {
+  pointer-events: none;
+  position: absolute;
+  opacity: 0;
+  transform: translateY(40px) scale(0.6);
+  transition: all 400ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  visibility: hidden;
+}
+
+.locations-map_item.is--show {
+  pointer-events: auto;
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  visibility: visible;
+}
+
+.locations-map_item.is--hiding {
+  opacity: 0;
+  transform: translateY(40px) scale(0.6);
+  pointer-events: none;
+}
+
+/* Hide popup tips */
+.mapboxgl-popup-tip {
+  display: none;
+}
+
+/* Radius Animation */
+@keyframes pulse {
+  0% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+}
+
+.search-radius-outer {
+  animation: pulse 2s ease-out infinite;
+}
+
+/* Distance markers */
+.distance-marker {
+  font-family: Poppins, sans-serif;
+  font-size: 10px;
+  color: #333;
+  margin-left: 2.2em;
+}
+
+.distance-marker-distance {
+  font-weight: 600;
+}
+
+/* Styling voor uitgeschakelde AR knoppen */
+.button-base.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: rgba(200,200,200,0.2);
+}
+
+.mobile-only {
+  font-size: 0.9em;
+  margin-left: 4px;
+}
+
+/* ==============================
+ * LOCATION BOUNDARY POPUP
+ * ============================== */
+
+.location-boundary-popup {
+  position: fixed;
+  bottom: clamp(90px, 15vh, 120px);
+  right: 10px;
+  transform: translateX(120%);
+  background: #f3f3f3;
+  padding: clamp(15px, 5vw, 20px);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  width: min(300px, calc(100vw - 40px));
+  text-align: left;
+  transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+
+/* Heading styles */
+h3 {
+  margin-top: 20px;
+  font-family: astronef-std-super-cond, sans-serif !important;
+  font-size: 2em;
+  font-weight: 200;
+  line-height: 0.75em;
+  text-transform: uppercase;
+  text-align: left;
+}
+
+.location-boundary-popup p {
+  font-family: poppins, sans-serif;
+  color: #4A4A4A;
+  margin-bottom: clamp(15px, 4vw, 20px);
+  line-height: 1.2;
+}
+
+.location-boundary-popup button {
+  font-family: poppins, sans-serif;
+  background: #4B83F2;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  font-size: clamp(0.95em, 3.5vw, 1.1em);
+  width: 100%;
+}
+
+/* ===== VOEG DEZE REGELS TOE ===== */
+
+/* Stijl voor wanneer de popup zichtbaar moet zijn (desktop) */
+.location-boundary-popup.show {
+  transform: translateX(0); /* Schuif naar de normale positie (in beeld) */
+}
+
+/* Stijlen specifiek voor mobiel */
+@media screen and (max-width: 767px) {
+  /* Pas de initiële positie aan voor mobiel (onderaan) */
+  .location-boundary-popup {
+    transform: translateY(100%); /* Start onderaan */
+    bottom: 10px;
+    /* Optioneel: Laat het over de breedte lopen met wat marge */
+    right: 10px;
+    left: 10px;
+    width: auto; /* Reset vaste breedte */
+  }
+
+  /* Stijl voor wanneer de popup zichtbaar moet zijn (mobiel) */
+  .location-boundary-popup.show {
+    transform: translateY(0); /* Schuif omhoog in beeld */
+  }
+}
+
+/* ==============================
+ * ERROR NOTIFICATIONS
+ * ============================== */
+
+.geolocation-error-notification {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ff4444;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-family: poppins, sans-serif;
+  font-size: 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  animation: slideUp 0.3s ease-out forwards;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translate(-50%, 100%);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+}
+
+/* ==============================
+ * POPUP STYLES & ANIMATIONS
+ * ============================== */
+
+.mapboxgl-popup-content {
+  padding: 0 !important;
+  border-radius: 20px !important;
+  overflow: visible !important;
+  width: 300px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  transform-style: preserve-3d !important;
+  perspective: 1000px;
+}
+
+/* Popup flip animation */
+.popup-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
+}
+
+.popup-wrapper.is-flipped {
+  transform: rotateY(180deg);
+}
+
+.popup-side {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  color: white;
+}
+
+.popup-front {
+  transform: rotateY(0deg);
+}
+
+.popup-back {
+  transform: rotateY(180deg);
+}
+
+.content-wrapper {
+  padding: 30px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  z-index: 2;
+}
+
+/* Popup typography */
+.popup-title {
+  font-weight: bold;
+  font-family: astronef-std-super-cond, sans-serif;
+  font-size: 4em;
+  font-weight: 200;
+  line-height: 0.75em;
+  text-transform: uppercase;
+  text-align: center;
+  margin-top: 1.75em;
+}
+
+.popup-title.details {
+  font-size: 2.6em;
+  text-align: left;
+  margin-top: 0.7em;
+}
+
+.popup-background-image {
+  object-fit: cover;
+  object-position: center;
+  width: 100%;
+  height: 37%;
+  position: absolute;
+  top: 0%;
+  left: 50%;
+  transform: translate(-50%, 0%);
+  z-index: -2;
+}
+
+.popup-border-overlay {
+  position: absolute;
+  top: 3rem;
+  left: 0;
+  width: 100%;
+  height: 37%;
+  z-index: -1;
+}
+
+#paint0_linear_3248_5 {
+  transition: y1 0.5s ease, y2 0.5s ease;
+}
+
+/* Popup description */
+.popup-description {
+  font-family: poppins, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 4em;
+  margin-top: 1em;
+  flex-grow: 1;
+  overflow-y: scroll;
+  max-height: 12em;
+  text-align: center;
+  padding-right: 15px;
+  margin-right: -15px;
+  -webkit-overflow-scrolling: touch;
+  pointer-events: auto !important;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  cursor: grab;
+  color: white;
+}
+
+.gradient-bottom {
+  position: absolute;
+  bottom: 7.9em;
+  left: 0;
+  right: 0;
+  height: 1em;
+  background: linear-gradient(to top, #eb5f5e 0%, transparent 100%);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.popup-description-ar {
+  font-family: poppins, sans-serif;
+  font-size: 14px;
+  margin-bottom: 5em;
+  margin-top: 1em;
+  text-align: center;
+  color: white;
+}
+
+ /* Specifieke tekststijlen voor AR popup */
+ .popup-side.ar .popup-title {
+  color: #000000;
+}
+
+.popup-side.ar .popup-description {
+  color: #000000;
+}
+
+/* Knoppen in AR popup */
+.popup-side.ar .button-base {
+  color: #000000;
+  border-color: #000000;
+}
+
+/* Styling voor beide kanten van de popup */
+.popup-side.ar .popup-front,
+.popup-side.ar .popup-back {
+  color: #000000;
+}
+
+.popup-description:active {
+  cursor: grabbing;
+}
+
+p {
+  color: white;
+  font-family: poppins, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Scrollbar styling for popup description */
+.popup-description::-webkit-scrollbar {
+  width: 5px;
+  background-color: transparent;
+}
+
+.popup-description::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+.popup-description::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(255, 255, 255, 0.4);
+  border-radius: 10px;
+  background-color: transparent;
+}
+
+/* ==============================
+ * POPUP BUTTONS
+ * ============================== */
+
+.button-base {
+  position: absolute;
+  background: rgba(255,255,255,0.2);
+  border: 1px solid rgba(255,255,255,0.4);
+  backdrop-filter: blur(5px);
+  color: rgb(255, 255, 255);
+  padding: 7px 20px;
+  border-radius: 30px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.button-base:hover {
+  background: rgba(255,255,255,0.25);
+  transform: scale(1.01);
+}
+
+.impressie-button {
+  bottom: 30px;
+  right: 30px;
+}
+
+.more-info-button,
+.terug-button {
+  bottom: 30px;
+  left: 30px;
+}
+
+.close-button {
+  position: absolute;
+  top: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  z-index: 20;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+  transition: transform 0.3s ease;
+}
+
+.close-button:hover {
+  transform: translateX(-50%) rotate(180deg) scale(1.1);
+}
+
+/* X for close button */
+.close-button::before,
+.close-button::after {
+  content: '';
+  position: absolute;
+  background-color: white;
+  width: 12px;
+  height: 2px;
+  border-radius: 15px;
+  transition: transform 0.3s ease;
+  top: 50%;
+  left: 50%;
+}
+
+
+.close-button::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.close-button::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.popup-ar-instructie{
+color: black;
+margin-top: 1rem;
+}
+
+/* ==============================
+ * MOBILE ADAPTATIONS
+ * ============================== */
+
+@media screen and (max-width: 767px) {
+  .mapboxgl-popup-content {
+    width: 260px !important;
+  }
+
+  .popup-title {
+    margin-top: 2.5em;
+    font-size: 3em !important;
+  }
+
+  p {
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .content-wrapper {
+    padding: 25px;
+  }
+
+  .popup-description {
+    max-height: 9em;
+    margin-top: .75em;
+    margin-bottom: 4em;
+}
+
+.popup-description {
+  max-height: 9em;
+  margin-top: .75em;
+  margin-bottom: 4em;
+}
+
+
+  .button-base {
+    border-radius: 59px;
+        padding: 5px 16px;
+        font-size: 12px;
+  }
+}
+
+/* ==============================
+ * DETAILS CARD SPECIFIC STYLING
+ * ============================== */
+
+.popup-back .content-wrapper {
+  padding: 30px;
+  color: white;
+  height: 100%;
+}
+
+.info-content {
+  margin-top: 0.5em;
+}
+
+.social-icons {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  display: flex;
+  gap: 10px;
+}
+
+.social-icons a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.8);
+  color: #333;
+  transition: all 0.2s ease;
+}
+
+.social-icons a:hover {
+  background-color: white;
+  transform: scale(1.1);
+}
+
+.social-icons svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ==============================
+ * IMAGE POPUP SPECIFIC
+ * ============================== */
+
+.image-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.full-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.button-container {
+  position: absolute;
+  bottom: 30px;
+  right: 30px;
+  z-index: 10;
+}
+
+.back-button {
+  background: rgba(255,255,255,0.2);
+  border: 1px solid rgba(255,255,255,0.4);
+  color: white;
+  padding: 7px 20px;
+  border-radius: 30px;
+  cursor: pointer;
+  font-size: 14px;
+  backdrop-filter: blur(5px);
+  transition: all 0.5s ease;
+  font-family: poppins, sans-serif;
+}
+
+.back-button:hover {
+  background: rgba(255,255,255,0.25);
+  transform: scale(1.01);
+}
+
+.location-name {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20px 30px;
+  background: linear-gradient(transparent, rgba(0,0,0,0.7));
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  font-family: poppins, sans-serif;
+  text-transform: uppercase;
+}
+
+/* ==============================
+ * INTERACTION BLOCKER
+ * ============================== */
+
+#interaction-blocker {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: white;
+  pointer-events: all;
+  z-index: 9999;
+  cursor: not-allowed;
+}
+
+/* Popup container for text */
+.zoomend-popup {
+  color: #333;
+  z-index: 10001;
+  font-weight: bold;
+  font-family: astronef-std-super-cond, sans-serif;
+  font-size: 10em;
+  font-weight: 200;
+  line-height: 0.75em;
+  text-transform: uppercase;
+  text-align: center;
+  width: 350px;
+}
+
+.zoomend-popup .letter {
+  display: inline-block;
+  transform-origin: bottom;
+}
+
+/* ==============================
+ * EXPERIENCE STEPS & NAVIGATION
+ * ============================== */
+
+.experience-step-title {
+  font-size: 1.2rem;
+  margin-bottom: 0px;
+}
+
+.experience-step-text {
+  font-size: 0.75rem;
+  font-family: poppins, sans-serif;
+  font-weight: normal;
+  line-height: 1.4;
+}
+
+.experience-steps {
+  -webkit-overflow-scrolling: touch;
+  max-height: 13.5rem;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  margin-right: -15px;
+  padding-right: 15px;
+  overflow-y: scroll;
+  touch-action: pan-y;
+  cursor: grab;
+}
+
+.experience-steps:active {
+  cursor: grabbing;
+}
+
+/* Custom scrollbar for experience steps */
+.experience-steps::-webkit-scrollbar {
+  width: 5px;
+  background-color: transparent;
+}
+
+.experience-steps::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+.experience-steps::-webkit-scrollbar-track {
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Prevent text selection */
+.experience-steps, 
+.experience-steps * {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  touch-action: pan-y !important;
+}
+
+/* Marker Navigation */
+.marker-navigation {
+  position: fixed;
+  top: 50%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+  z-index: 1000;
+  padding: 0 20px;
+}
+
+.nav-arrow {
+  pointer-events: all;
+  background: rgba(255,255,255,0.9);
+  border: 2px solid #000;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  transition: all 0.3s ease;
+}
+
+.nav-arrow:hover {
+  background: #000;
+  color: white;
+  transform: scale(1.1);
+}
+
+.nav-arrow:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* ==============================
+ * TOUR STYLES
+ * ============================== */
+
+/* Main Shepherd Theme */
+.shepherd-theme-heerlen {
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  max-width: 260px !important;
+  z-index: 10000;
+}
+
+.shepherd-theme-heerlen .shepherd-content {
+  border-radius: 12px;
+  box-shadow: 0 4px 20px var(--shadow-color);
+  padding: 14px;
+  background-color: white;
+  overflow: hidden;
+}
+
+.shepherd-theme-heerlen .shepherd-text {
+  font-size: 13px;
+  line-height: 1.4;
+  color: #333;
+  padding: 0;
+}
+
+.shepherd-text p {
+  margin-top: 0;
+  color: black;
+}
+
+.shepherd-theme-heerlen .shepherd-text b,
+.shepherd-theme-heerlen .shepherd-text strong {
+  color: #000;
+  font-weight: 600;
+}
+
+.shepherd-theme-heerlen .shepherd-footer {
+  padding-top: 12px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  border-top: none;
+  margin: 0;
+}
+
+.shepherd-theme-heerlen .shepherd-button {
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  margin: 0;
+}
+
+.shepherd-theme-heerlen .shepherd-button-primary {
+  background: #333 !important;
+  color: white !important;
+  border: none;
+}
+
+.shepherd-theme-heerlen .shepherd-button-primary:hover {
+  background: #000 !important;
+  transform: scale(1.03);
+}
+
+.shepherd-theme-heerlen .shepherd-button-secondary {
+  background: #f0f0f0 !important;
+  color: #333 !important;
+  border: none;
+}
+
+.shepherd-theme-heerlen .shepherd-button-secondary:hover {
+  background: #e5e5e5 !important;
+  transform: scale(1.03);
+}
+
+/* Remove tour header */
+.shepherd-theme-heerlen .shepherd-header {
+  display: none;
+}
+
+/* Tour cancel icon */
+.shepherd-theme-heerlen .shepherd-cancel-icon {
+  color: #999;
+  font-size: 16px;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.shepherd-theme-heerlen .shepherd-cancel-icon:hover {
+  opacity: 1;
+}
+
+/* Tour highlight effect */
+.tour-highlight-pulse {
+  box-shadow: 0 0 0 rgba(0, 0, 0, 0.5);
+  animation: minimalist-pulse 1s 2;
+}
+
+@keyframes minimalist-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.3);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(0, 0, 0, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
+  }
+}
+
+/* ==============================
+ * WELCOME OVERLAY
+ * ============================== */
+
+.welcome-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.welcome-card {
+  background-color: white;
+  padding: 16px;
+  border-radius: 12px;
+  max-width: 90%;
+  width: 260px;
+  text-align: center;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.15);
+  transform: translateY(20px);
+  opacity: 0;
+  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.welcome-card p {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  color: #333;
+}
+
+.welcome-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.welcome-start-btn, .welcome-skip-btn {
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.welcome-start-btn {
+  background: #333;
+  color: white;
+  border: none;
+}
+
+.welcome-start-btn:hover {
+  background: #000;
+  transform: scale(1.03);
+}
+
+.welcome-skip-btn {
+  background: #f0f0f0;
+  color: #333;
+  border: none;
+}
+
+.welcome-skip-btn:hover {
+  background: #e5e5e5;
+  transform: scale(1.03);
+}
+
+/* ==============================
+ * MARKER ANIMATION
+ * ============================== */
+
+.tour-marker-instruction {
+  text-align: center;
+}
+
+.marker-animation {
+  position: relative;
+  height: 10px;
+  margin-top: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pulse-dot {
+  width: 15px;
+  height: 15px;
+  background-color: #333;
+  border-radius: 50%;
+  position: relative;
+  display: inline-block;
+}
+
+.pulse-dot:before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background-color: #333;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+.instruction-arrow {
+  position: absolute;
+  font-size: 18px;
+  animation: bounce 1.5s infinite;
+  transform: translateY(-20px);
+  color: #333;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-20px);
+  }
+  60% {
+    transform: translateY(-10px);
+  }
+}
+
+/* ==============================
+ * FLOATING INSTRUCTIONS
+ * ============================== */
+
+.tour-instruction-message {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.2);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-family: 'Poppins', sans-serif;
+  z-index: 9999;
+  animation: fadeInOut 4s ease-in-out;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translate(-50%, 20px); }
+  15% { opacity: 1; transform: translate(-50%, 0); }
+  85% { opacity: 1; transform: translate(-50%, 0); }
+  100% { opacity: 0; transform: translate(-50%, -20px); }
+}
+
+/* ==============================
+ * PROGRESS BAR
+ * ============================== */
+
+.shepherd-progress-bar {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10000;
+  background: white;
+  border-radius: 20px;
+  padding: 5px 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.progress-inner {
+  width: 120px;
+  height: 3px;
+  background: #f0f0f0;
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.progress-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: #000;
+  transition: width 0.3s ease;
+  width: 0%;
+}
+
+.progress-bar-close-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  margin: 0;
+  border-radius: 50%;
+  background: #e0e0e0;
+  border: none;
+  color: #666;
+  font-size: 14px;
+  font-weight: bold;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.1s ease;
+  flex-shrink: 0;
+}
+
+.progress-bar-close-btn:hover {
+  background-color: #ccc;
+  color: #333;
+}
+
+.progress-bar-close-btn:active {
+  transform: scale(0.9);
+}
+
+@media (max-width: 479px) {
+  .shepherd-progress-bar {
+    padding: 4px 8px;
+    gap: 8px;
+  }
+  .progress-bar-close-btn {
+    width: 16px;
+    height: 16px;
+    font-size: 12px;
+  }
+}
+
+/* ==============================
+ * COMPLETION MESSAGE
+ * ============================== */
+
+.tour-completion-message {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  z-index: 9999;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  opacity: 0;
+  animation: fadeInOutMessage 4s ease-in-out forwards;
+}
+
+@keyframes fadeInOutMessage {
+  0% { opacity: 0; transform: translate(-50%, 20px); }
+  15% { opacity: 1; transform: translate(-50%, 0); }
+  85% { opacity: 1; transform: translate(-50%, 0); }
+  100% { opacity: 0; transform: translate(-50%, -20px); }
+}
+
+.completion-content {
+  text-align: center;
+}
+
+.completion-content h3 {
+  margin-top: 0;
+  margin-bottom: 5px;
+}
+
+.completion-content p {
+  margin: 0;
+}
+
+/* ==============================
+ * HELP BUTTON
+ * ============================== */
+
+.help-button {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: white;
+  border: 1px solid #ddd;
+  font-weight: 500;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  padding: 0;
+  margin: 0;
+  padding-top: 10px;
+  color: #333;
+}
+
+.help-button:hover {
+  background: #333;
+  color: white;
+  transform: scale(1.05);
+}
+
+.help-button:active {
+  transform: scale(0.95);
+}
+
+/* ==============================
+ * RESPONSIVE ADJUSTMENTS
+ * ============================== */
+
+@media (max-width: 479px) {
+  .welcome-card {
+    padding: 14px;
+    max-width: 85%;
+    width: 220px;
+  }
+  
+  .tour-instruction-message {
+    width: 80%;
+    font-size: 12px;
+    bottom: 60px;
+    padding: 8px 16px;
+  }
+}
+
+/* Modal overlay for tour */
+.shepherd-modal-overlay-container.shepherd-modal-is-visible {
+  height: 100vh;
+  opacity: 0.25;
+  transform: translateZ(0);
+}
+
+/* ==============================
+ * PRINT STYLES
+ * ============================== */
+
+@media print {
+  .mapboxgl-ctrl-group,
+  .location-boundary-popup,
+  .geolocation-error-notification {
+    display: none !important;
+  }
+}
+
+.performance-tooltip,
+.performance-warning {
+  position: absolute;
+  z-index: 1000;
+  background: white;
+  border-radius: 4px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  max-width: 300px;
+  animation: fade-in 0.3s ease;
+}
+
+.performance-warning {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 400px;
+}
+
+.tooltip-content,
+.warning-content {
+  padding: 15px;
+  position: relative;
+}
+
+.tooltip-content h3,
+.warning-content h3 {
+  margin-top: 0;
+  color: #333;
+  font-size: 16px;
+}
+
+.tooltip-content p,
+.warning-content p {
+  margin: 8px 0;
+  font-size: 14px;
+  color: #555;
+}
+
+.tooltip-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #999;
+}
+
+.warning-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+
+.warning-ok,
+.warning-enable {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.warning-ok {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.warning-enable {
+  background: #4264fb;
+  color: white;
+}
+
+.toggle-3d-button {
+  background-size: 16px;
+  background-position: center;
+}
+
+.toggle-3d-button.is-active {
+  background-color: #4264fb;
+  color: white;
+}
+
+.toggle-3d-button svg {
+  display: block;
+  margin: auto;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* popup-styles.css (of waar je popup stijlen staan) */
+
+/* In popup-styles.css */
+
+/* In popup-styles.css */
+
+/* In popup-styles.css */
+
+/* ==================================================== */
+/* Popup Social Icon Styling (Top-Right, Glass Circle) */
+/* ==================================================== */
+
+/* Container (blijft hetzelfde) */
+.custom-popup .social-icons {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 3;
+}
+
+/* Stijl voor de individuele icon links - Cirkel (blijft hetzelfde) */
+.custom-popup .social-icons a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+/* Hover effect (blijft hetzelfde) */
+.custom-popup .social-icons a:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+/* --- AANGEPASTE SVG STYLING --- */
+
+/* Algemene SVG stijl (grootte, geen filter meer) */
+.custom-popup .social-icons svg {
+  width: 16px;
+  height: 16px;
+  filter: none; /* Geen drop shadow */
+}
+
+/* Specifiek voor Instagram & Facebook: VULLEN MET WIT */
+.custom-popup .social-icons a[aria-label="Instagram"] svg,
+.custom-popup .social-icons a[aria-label="Facebook"] svg {
+  fill: white;
+  stroke: none; /* Geen outline voor deze */
+}
+
+/* Specifiek voor Website: WITTE OUTLINE, GEEN VULLING */
+.custom-popup .social-icons a[aria-label="Website"] svg {
+  fill: none;         /* Geen vulling */
+  stroke: white;      /* Witte lijn */
+  stroke-width: 2;    /* Lijn dikte (pas aan indien nodig, matcht origineel) */
+  stroke-linecap: round; /* Afgeronde lijneinden */
+  stroke-linejoin: round;/* Afgeronde lijnhoeken */
+}
