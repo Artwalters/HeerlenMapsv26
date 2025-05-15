@@ -2889,7 +2889,7 @@ function showWelcomeMessage(callback) {
   overlay.className = 'welcome-overlay';
   overlay.innerHTML = `
     <div class="welcome-card">
-      <p> Welkom in<strong>Heerlen</strong>deze kaart heeft veel unieke functies die ik je graag uitleg </p>
+      <p> Welkom in <strong>Heerlen</strong> deze kaart heeft veel unieke functies die ik je graag uitleg </p>
       <div class="welcome-buttons">
         <button class="welcome-start-btn">Start tour</button>
         <button class="welcome-skip-btn">Skip tour</button>
